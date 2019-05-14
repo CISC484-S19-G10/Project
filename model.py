@@ -6,7 +6,6 @@ from __future__ import division
 import tensorflow as tf
 from tensorflow.keras import datasets, layers, models
 
-
 def model(test,train,spe):
 
     model = models.Sequential()
@@ -44,9 +43,9 @@ import numpy
 
 import pathlib
 
-def open_folder():
+def open_folder(folder):
     paths = []
-    for root, dirs, files in os.walk("./gen_midi"):
+    for root, dirs, files in os.walk(folder):
         for f in files:
             path = os.path.join(root,f)
             path = os.path.abspath(path)
@@ -72,15 +71,35 @@ tf.enable_eager_execution()
 #open_folder()
 #print(tf.__version__)
 
-paths = open_folder()
+midi_dir = "./gen_midi"
 
-#print(paths)
-label_num = {'Electronic': 0, 'Jazz': 1, 'Rock': 2}
+#get all top level categories as path names
+label_dirs = [os.path.join(midi_dir, d) for d in os.listdir(midi_dir)]
 
-labels = [x.split("/")[7] for x in paths]
+#number the labels
+label_nums = {os.path.basename(d): i for i, d in enumerate(label_dirs)}
+#print(label_nums)
+
+#for each top-level category... 
+paths = []
+labels = []
+for label_dir in label_dirs:
+    print(label_dir)
+    
+    #...find all files in that category...
+    dir_files = open_folder(label_dir)
+    print(dir_files)
+    paths += dir_files
+
+    #...and label them acordingly
+    label_num = label_nums[os.path.basename(label_dir)]
+    print(label_num)
+    for f in dir_files:
+        labels.append(label_num)
+
 #print(labels)
-#print(label_num[labels[0]])
-labels = [label_num[x] for x in labels]
+#print(paths)
+#print(label_nums[labels[0]])
 
 #print(labels)
 #print(paths)
